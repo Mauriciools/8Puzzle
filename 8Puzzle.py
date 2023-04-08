@@ -35,7 +35,7 @@ class Node:
                     return row, column
 
     """
-    Copies the data from an original node to another one.
+    Copy the data from an original node to another one.
     """
     def copyNode(self):
         copiedNode = []
@@ -59,7 +59,7 @@ class Node:
     def findAvailableMoves(self):
         availableMoves = []
 
-        # Finds the position (row, column) of the blank tile in the current node
+        # Find the position (row, column) of the blank tile in the current node
         row, column = self.findPosition(0)
 
         # Verifies based on the blank position the available moving positions, and append it to a list
@@ -75,17 +75,17 @@ class Node:
         return availableMoves
 
     """
-    Generates child nodes from the current one.
+    Generate child nodes from the current one.
     """
     def generateChildren(self):
         children = []
 
-        # Finds the available moves for the current node
+        # Find the available moves for the current node
         availableMoves = self.findAvailableMoves()
 
         # For each move
         for move in availableMoves:
-            # Finds the blank position
+            # Find the blank position
             row, column = self.findPosition(0)
             
             # Copies the current node and applies the movement by switching the positions of the blank tile and 
