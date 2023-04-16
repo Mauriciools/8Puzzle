@@ -230,28 +230,92 @@ class Puzzle:
                     self.open.sort(key=lambda n: n.g)
 # ---------------------------------------------------------------------------------------
 
-testData = [[1, 2, 3], [4, 0, 6], [7, 5, 8]]
-testData2 = [[5, 8, 1], [2, 3, 7], [4, 6, 0]]
+# Random data for testing
+testData = [[5, 8, 1], [2, 3, 7], [4, 6, 0]]
 
+# Print basic info on the screen about the input data
 print("----------8Puzzle solver----------")
+print("""Hello, user! :D
+You'll be asked to put your input data soon...
+Please provide 9 int different numbers from 0 to 8 with spaces between.\n""")
+
+# Ask the input data to the user
+inputData = input("Input your data here as requested: ").strip().split(" ")
+intInputData = []
+
+# Transform the input data to an integer 3x3 matrix
+tempData = []
+for i in range(1, 10):
+    tempData.append(int(inputData[i - 1]))
+    if (i % 3 == 0):
+        intInputData.append(tempData)
+        tempData = []
+
+# Print the initial node passed by the user
 print("Initial node:")
-for i in range(len(testData)):
-    print(testData[i])
+for i in range(len(intInputData)):
+    print(intInputData[i])
+print('----------------------------------------------------------')
 
-print('-------------------------------')
-puzzle = Puzzle(testData2)
+# Ask the user for selecting the desired solving method and the maximum number of iterations
+print("""There are four available methods for solving the 8-Puzzle.
+UC - Uniform Cost
+A* - Simple Heuristic
+A*+ - Manhattan Heuristic
+A*++ - Euclidian Heuristic 
+all - Run all methods one after another
+To learn more about each of these methods, please read our report document sent along with this code. :) \n""")
+method = input("Select the wanted method for solving the 8-Puzzle (UC, A*, A*+, A*++, all): ").strip()
+maxIterations = int(input("Now, please select the maximum number of iterations: "))
+print('----------------------------------------------------------')
 
-# Calculate elapsed time
-start = time.time()
-finalNode = puzzle.solve("A*++", 10000)
-end = time.time()
 
-# If the code found a proper solution, presents the information to the user
-if (finalNode is not None):
-    print("Visited nodes:", len(puzzle.visited))
-    print("Path taken (cost):", finalNode.cost)
-    print("Execution time (s):", end - start)
-# Otherwise throw the failure message
+
+"""
+Function for handling the solving steps and the final printing on the screen to the user.
+This function is usefull when we use "all" as the desired method to solve the 8-Puzzle.
+In this way, we can just execute this function four times in sequence, as we have four different methods to execute in the "all" option.
+
+Args:
+    method (str): The method for solving the 8Puzzle game.
+        (Current available methods: "UC", "A*", "A*+", and "A*++".
+        Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, and Euclidian heuristic).
+"""
+def solveAndPrint(method: str):
+    # Instantiate the puzzle with the input data passed by the user
+    puzzle = Puzzle(intInputData)
+
+    # Calculate elapsed time of the solving step
+    start = time.time()
+    finalNode = puzzle.solve(method, maxIterations)
+    end = time.time()
+
+    # If the code found a proper solution, present the information to the user
+    if (finalNode is not None):
+        print("Visited nodes:", len(puzzle.visited))
+        print("Path taken (cost):", finalNode.cost)
+        print("Execution time (s):", end - start)
+    # Otherwise throw the failure message
+    else:
+        print(f"A solution could not be reached within the maximum number of iterations ({maxIterations}).")
+        print("Execution time (s):", end - start)
+
+    print('----------------------------------------------------------')
+    return
+
+# If all methods were selected at once, we execute them one after another and print the results on the screen also one after another
+if (method == "all"):
+    print("Solving for UC: ")
+    solveAndPrint("UC")
+
+    print("Solving for A*: ")
+    solveAndPrint("A*")
+
+    print("Solving for A*+: ")
+    solveAndPrint("A*+")
+
+    print("Solving for A*++: ")
+    solveAndPrint("A*++")
+# Otherwise, just solve and print for the desired method
 else:
-    print("A solution could not be reached within the maximum (10000) iterations.")
-    print("Execution time (s):", end - start)
+    solveAndPrint(method)
