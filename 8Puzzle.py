@@ -135,7 +135,6 @@ class Puzzle:
                 childNode.heuristic += 1
 
         childNode.g = childNode.cost + childNode.heuristic
-        return childNode.g
 
     """
     Apply the Manhattan distance heuristic.
@@ -156,7 +155,6 @@ class Puzzle:
             childNode.heuristic += manhattanDistance
 
         childNode.g = childNode.cost + childNode.heuristic
-        return childNode.g
 
     """
     Apply the Euclidian distance heuristic.
@@ -177,7 +175,6 @@ class Puzzle:
             childNode.heuristic += euclidianDistance
 
         childNode.g = childNode.cost + childNode.heuristic
-        return childNode.g
 
     """
     Solve the 8Puzzle game for a node using a specified method.
@@ -194,6 +191,7 @@ class Puzzle:
 
         # If the initial node is the solution, return the initial node
         if (self.initialNode.data == self.expectedResult):
+            print("The initial node passed is already the expected solution.")
             return self.initialNode
 
         # Iterate until find the solution or reach the maxIterations defined
@@ -217,11 +215,11 @@ class Puzzle:
                         case "UC":
                             child.g = child.cost
                         case "A*":
-                            child.g = self.simpleHeuristic(child)
+                            self.simpleHeuristic(child)
                         case "A*+":
-                            child.g = self.manhattanHeuristic(child)
+                            self.manhattanHeuristic(child)
                         case "A*++":
-                            child.g = self.euclidianHeuristic(child)
+                            self.euclidianHeuristic(child)
                         case _:
                             print("There is no algorithm available for the specified method or the method doesn't exist.")
                             return None
@@ -237,10 +235,16 @@ testData = [[5, 8, 1], [2, 3, 7], [4, 6, 0]]
 print("----------8Puzzle solver----------")
 print("""Hello, user! :D
 You'll be asked to put your input data soon...
-Please provide 9 int different numbers from 0 to 8 with spaces between.\n""")
+Please provide 9 int different numbers from 0 to 8 with one space between to form your 3x3 puzzle. Example: 5 8 1 2 3 7 4 6 0\n""")
 
 # Ask the input data to the user
 inputData = input("Input your data here as requested: ").strip().split(" ")
+
+# If the input data passed contains less than 9 numbers, exit the program
+if (len(inputData) < 9):
+    print("The input data that you provided contains less than 9 numbers. Finishing...")
+    exit(-1)
+
 intInputData = []
 
 # Transform the input data to an integer 3x3 matrix
