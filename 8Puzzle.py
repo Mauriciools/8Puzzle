@@ -98,6 +98,13 @@ class Node:
             children.append(child)
 
         return children
+    
+    """
+    Print the node data on the screen.
+    """
+    def printNodeData(self):
+        for i in range(len(self.data)):
+            print(self.data[i])
 
 # Class to handle 8Puzzle operations, such as the solver for a given game and the calculus for different heuristics
 class Puzzle:
@@ -152,6 +159,29 @@ class Puzzle:
             # Find the Manhattan distance (vertical + horizontal) of a tile in the child node to its corresponding goal in the final one
             # And add this value to the child node heuristic
             manhattanDistance = abs(position1[0] - position2[0]) + abs(position1[1] - position2[1])
+            childNode.heuristic += manhattanDistance
+
+        childNode.g = childNode.cost + childNode.heuristic
+
+    """
+    Apply the enhanced Manhattan distance heuristic.
+    It adds to the original Manhattan heuristic a little gain for tiles with the corresponding distance = 1.
+    Args:
+        childNode (Node): The child node.
+    """
+    def manhattanEnhancedHeuristic(self, childNode: Node):
+        # For every number (0-9) in the matrix, find the corresponding position in the child node and in the final one
+        for i in range(9):
+            position1 = childNode.findPosition(i)
+            position2 = self.finalNode.findPosition(i)
+
+            # Find the Manhattan distance (vertical + horizontal) of a tile in the child node to its corresponding goal in the final one
+            manhattanDistance = abs(position1[0] - position2[0]) + abs(position1[1] - position2[1])
+
+            # 
+            if (manhattanDistance == 1):
+                manhattanDistance *= 1.5
+
             childNode.heuristic += manhattanDistance
 
         childNode.g = childNode.cost + childNode.heuristic
@@ -216,9 +246,11 @@ class Puzzle:
                             child.g = child.cost
                         case "A*":
                             self.simpleHeuristic(child)
-                        case "A*+":
+                        case "A* M":
                             self.manhattanHeuristic(child)
-                        case "A*++":
+                        case "A* EM":
+                            self.manhattanEnhancedHeuristic(child)
+                        case "A* E":
                             self.euclidianHeuristic(child)
                         case _:
                             print("There is no algorithm available for the specified method or the method doesn't exist.")
@@ -226,10 +258,75 @@ class Puzzle:
 
                     # Sort the open list based on the node.g attribute
                     self.open.sort(key=lambda n: n.g)
+
 # ---------------------------------------------------------------------------------------
 
 # Random data for testing
 testData = [[5, 8, 1], [2, 3, 7], [4, 6, 0]]
+
+"""
+Function for handling the solving steps and the final printing on the screen to the user.
+This function is usefull when we use "all" as the desired method to solve the 8-Puzzle.
+In this way, we can just execute this function four times in sequence, as we have four different methods to execute in the "all" option.
+
+Args:
+    method (str): The method for solving the 8Puzzle game.
+        (Current available methods: "UC", "A*", "A*+", and "A*++".
+        Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, and Euclidian heuristic).
+"""
+def solveAndPrint(method: str):
+    # Instantiate the puzzle with the input data passed by the user
+    puzzle = Puzzle(intInputData)
+
+    # Calculate elapsed time of the solving step
+    start = time.time()
+    finalNode = puzzle.solve(method, maxIterations)
+    end = time.time()
+
+    # If the code found a proper solution, present the information to the user
+    if (finalNode is not None):
+        print("Visited nodes:", len(puzzle.visited))
+        print("Path taken (cost):", finalNode.cost)
+        print("Execution time (s):", end - start)
+    # Otherwise throw the failure message
+    else:
+        print(f"A solution could not be reached within the maximum number of iterations ({maxIterations}).")
+        print("Execution time (s):", end - start)
+
+    print('----------------------------------------------------------')
+    
+    return finalNode
+
+"""
+Print on the screen the path taken by the final node until reaching out the solution.
+It iterates from the solution until the initial node passed.
+
+Args:
+    finalNode (Node): The solution achieved by the algorithm.
+"""
+def showPathTaken(finalNode: Node):
+    print("Printing the path taken until solution...")
+    
+    # Print an up arrow
+    upArrow = u'\u2191'
+
+    # Define node and print it on the screen
+    node = finalNode
+    node.printNodeData()
+
+    # Print the path taken to find solution while it didn't reach the initial node
+    while (node.parent != None):
+        node = node.parent
+
+        print()
+        print("    " + upArrow)
+        print()
+
+        node.printNodeData()
+
+
+
+
 
 # Print basic info on the screen about the input data
 print("----------8Puzzle solver----------")
@@ -265,61 +362,35 @@ print('----------------------------------------------------------')
 print("""There are four available methods for solving the 8-Puzzle.
 UC - Uniform Cost
 A* - Simple Heuristic
-A*+ - Manhattan Heuristic
-A*++ - Euclidian Heuristic 
+A* M - Manhattan Heuristic
+A* EM - Enhanced Manhattan Heuristic
+A* E - Euclidian Heuristic 
 all - Run all methods one after another
 To learn more about each of these methods, please read our report document sent along with this code. :) \n""")
-method = input("Select the wanted method for solving the 8-Puzzle (UC, A*, A*+, A*++, all): ").strip()
+method = input("Select the wanted method for solving the 8-Puzzle (UC, A*, A* M, A* EM, A* E, all): ").strip()
 maxIterations = int(input("Now, please select the maximum number of iterations: "))
 print('----------------------------------------------------------')
 
-
-
-"""
-Function for handling the solving steps and the final printing on the screen to the user.
-This function is usefull when we use "all" as the desired method to solve the 8-Puzzle.
-In this way, we can just execute this function four times in sequence, as we have four different methods to execute in the "all" option.
-
-Args:
-    method (str): The method for solving the 8Puzzle game.
-        (Current available methods: "UC", "A*", "A*+", and "A*++".
-        Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, and Euclidian heuristic).
-"""
-def solveAndPrint(method: str):
-    # Instantiate the puzzle with the input data passed by the user
-    puzzle = Puzzle(intInputData)
-
-    # Calculate elapsed time of the solving step
-    start = time.time()
-    finalNode = puzzle.solve(method, maxIterations)
-    end = time.time()
-
-    # If the code found a proper solution, present the information to the user
-    if (finalNode is not None):
-        print("Visited nodes:", len(puzzle.visited))
-        print("Path taken (cost):", finalNode.cost)
-        print("Execution time (s):", end - start)
-    # Otherwise throw the failure message
-    else:
-        print(f"A solution could not be reached within the maximum number of iterations ({maxIterations}).")
-        print("Execution time (s):", end - start)
-
-    print('----------------------------------------------------------')
-    return
-
 # If all methods were selected at once, we execute them one after another and print the results on the screen also one after another
 if (method == "all"):
-    print("Solving for UC: ")
+    print("Solving for Uniform Cost: ")
     solveAndPrint("UC")
 
-    print("Solving for A*: ")
+    print("Solving for Simple Heuristic: ")
     solveAndPrint("A*")
 
-    print("Solving for A*+: ")
-    solveAndPrint("A*+")
+    print("Solving for Manhattan Heuristic: ")
+    solveAndPrint("A* M")
 
-    print("Solving for A*++: ")
-    solveAndPrint("A*++")
-# Otherwise, just solve and print for the desired method
+    print("Solving for Enhanced Manhattan Heuristic: ")
+    solveAndPrint("A* EM")
+
+    print("Solving for Euclidian Heuristic: ")
+    solveAndPrint("A* E")
+# Otherwise, solve and print for the desired method, and ask the user to show the complete path taken from the initial node until the solution
 else:
-    solveAndPrint(method)
+    finalNode = solveAndPrint(method)
+
+    pathTaken = input("Would you like to see the path taken until finding the solution? (Y or N) ").strip().upper()[0]
+    if (pathTaken == "Y"):
+        showPathTaken(finalNode)
