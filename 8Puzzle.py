@@ -178,9 +178,31 @@ class Puzzle:
             # Find the Manhattan distance (vertical + horizontal) of a tile in the child node to its corresponding goal in the final one
             manhattanDistance = abs(position1[0] - position2[0]) + abs(position1[1] - position2[1])
 
-            # 
-            if (manhattanDistance == 1):
-                manhattanDistance *= 1.5
+            md = 4
+            i2 = i + 1
+            i3 = i - 1
+            if i2 >= 1 and i2 <= 8:
+                position2 = childNode.findPosition(i2)
+                if position1[1] > 0 and position2[1] < 2:
+                    if (self.expectedResult[position1[0]][position1[1]-1] == i and self.expectedResult[position2[0]][position2[1]+1] == i2):
+                        manhattanDistance = md
+            if i3 >= 1 and i3 <= 8:
+                position3 = childNode.findPosition(i3)
+                if position2[1] > 0 and position3[1] < 2:
+                    if (self.expectedResult[position2[0]][position2[1]-1] == i2 and self.expectedResult[position3[0]][position3[1]+1] == i3):
+                        manhattanDistance = md
+            i2 = i + 3
+            i3 = i - 3
+            if i2 >= 1 and i2 <= 8:
+                position2 = childNode.findPosition(i2)
+                if position1[0] > 0 and position2[0] < 2:
+                    if (self.expectedResult[position1[0]-1][position1[1]] == i and self.expectedResult[position2[0]+1][position2[1]] == i2):
+                        manhattanDistance = md
+            if i3 >= 1 and i3 <= 8:
+                position3 = childNode.findPosition(i3)
+                if position2[0] > 0 and position3[0] < 2:
+                    if (self.expectedResult[position2[0]-1][position2[1]] == i2 and self.expectedResult[position3[0]+1][position3[1]] == i3):
+                        manhattanDistance = md
 
             childNode.heuristic += manhattanDistance
 
@@ -359,7 +381,7 @@ for i in range(len(intInputData)):
 print('----------------------------------------------------------')
 
 # Ask the user for selecting the desired solving method and the maximum number of iterations
-print("""There are four available methods for solving the 8-Puzzle.
+print("""There are five available methods for solving the 8-Puzzle.
 UC - Uniform Cost
 A* - Simple Heuristic
 A* M - Manhattan Heuristic
