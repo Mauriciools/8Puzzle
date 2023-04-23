@@ -232,8 +232,8 @@ class Puzzle:
     Solve the 8Puzzle game for a node using a specified method.
     Args:
         method (str): The method for solving the 8Puzzle game.
-            (Current available methods: "UC", "A*", "A*+", and "A*++".
-            Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, and Euclidian heuristic).
+            (Current available methods: "UC", "A*", "A* M", "A* EM", and "A* E".
+            Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, Enhanced Manhattan heuristic, and Euclidian heuristic).
     
         maxIterations (int): Define the number of maximum iterations to reach the solution.
     """
@@ -293,8 +293,8 @@ In this way, we can just execute this function four times in sequence, as we hav
 
 Args:
     method (str): The method for solving the 8Puzzle game.
-        (Current available methods: "UC", "A*", "A*+", and "A*++".
-        Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, and Euclidian heuristic).
+        (Current available methods: "UC", "A*", "A* M", "A* EM", and "A* E".
+        Respectively, they mean: Uniform cost, simple heuristic, Manhattan heuristic, enhanced Manhattan heuristic, and Euclidian heuristic).
 """
 def solveAndPrint(method: str):
     # Instantiate the puzzle with the input data passed by the user
